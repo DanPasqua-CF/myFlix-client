@@ -1,18 +1,26 @@
-export const MovieView = ({ movie, onBackClick }) => {
+import React from "react";
+
+const MovieView = ({ movie, onBackClick }) => {
   return (
-    <div>
+    <>
       <div>
-        <img src={movie.image} />
+        <img src={movie.image.imageUrl} alt={movie.title} />
       </div>
       <div>
-        <span>Title: </span>
-        <span>{movie.title}</span>
+        <strong>Title: </strong>
+        {movie.title}
       </div>
       <div>
-        <span>Director: </span>
-        <span>{movie.director}</span>
+        <strong>Description: </strong>
+        {movie.description}
+      </div>
+      <div>
+        <strong>Director: </strong>
+        {movie.directors.map((director) => director.name).join(", ")}
       </div>
       <button onClick={onBackClick}>Back</button>
-    </div>
+    </>
   );
 };
+
+export default MovieView;
