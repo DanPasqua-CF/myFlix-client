@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const MovieView = ({ movie, onBackClick }) => {
   return (
@@ -21,6 +22,15 @@ const MovieView = ({ movie, onBackClick }) => {
       <button onClick={onBackClick}>Back</button>
     </>
   );
+};
+
+MovieView.propTypes = {
+  movie: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    directors: PropTypes.string.isRequired
+  }).isRequired,
+  onBackClick: PropTypes.func.isRequired
 };
 
 export default MovieView;

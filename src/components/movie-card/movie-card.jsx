@@ -4,12 +4,14 @@ import PropTypes from "prop-types";
 const MovieCard = ({ movie, onMovieClick }) => {
   return (
     <div
-      onClick={() => onMovieClick(movie)}    
+      onClick={() => {
+        onMovieClick(movie);
+      }}    
     >
       <strong>{movie.title}</strong>
     </div>
-  )
-}
+  );
+};
 
 MovieCard.propTypes = {
   movie: PropTypes.shape({

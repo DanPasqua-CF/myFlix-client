@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import MovieCard from "../movie-card/movie-card"
 import MovieView from "../movie-view/movie-view";
+import LoginView from "../login-view/login-view";
 
 const MainView = () => {
   const [movies, setMovies] = useState([]);
+  const [selectedMovie, setSelectedMovie] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     /* USE HEROKU URL */
@@ -23,18 +26,37 @@ const MainView = () => {
     });
   }, []);
 
-  const [ selectedMovie, setSelectedMovie ] = useState(null);
+  if (!user) {
+    return <LoginView onLoggedIn={(user) => setUser(user)} />;
+  }
 
   if (selectedMovie) {
     return <MovieView movie = { selectedMovie } onBackClick={() => setSelectedMovie(null)} />;
   }
 
   if (movies.length === 0) {
-    return <div>The list is empty</div>;
-  }
+    return (
+      <>
+        <button
+          onClick={() => {
+            setUser(null);
+          }}
+        >
+          Logout
+        </button>
+      </>
+    );
+  };
 
   return (
     <>
+      <button
+        onClick={() => {
+          setUser(null);
+        }}
+      >
+        Logout
+      </button>
       {movies.map((movie) => (
         <MovieCard
           key={movie.id}
@@ -46,6 +68,6 @@ const MainView = () => {
       ))}
     </>
   );
-}
+};
 
 export default MainView;
