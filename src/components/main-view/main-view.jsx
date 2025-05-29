@@ -60,10 +60,13 @@ const MainView = () => {
       ) : (
         <>
           {movies.map((movie) => {
-            <Col className="mb-4" key={movie.id} md={3}>
-              <MovieCard movie={movie} onMovieClick={(newSelectedMovie) => {
-              setSelectedMovie(newSelectedMovie);
-            }} />
+            <Col className="mb-5" key={movie.id} md={3}>
+              <MovieCard 
+                movie={movie} 
+                onMovieClick={(newSelectedMovie) => {
+                  setSelectedMovie(newSelectedMovie);
+                }} 
+              />
             </Col>
           })}
         </>
