@@ -19,7 +19,7 @@ const MovieView = ({ movie, onBackClick }) => {
         <strong>Director: </strong>
         {movie.directors.map((director) => director.name).join(", ")}
       </div>
-      <button onClick={onBackClick}>Back</button>
+      <button onClick={onBackClick} className="back-button" style={{ cursor: "pointer" }}>Back</button>
     </>
   );
 };
