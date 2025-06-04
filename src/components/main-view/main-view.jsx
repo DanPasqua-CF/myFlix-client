@@ -4,10 +4,11 @@ import MovieView from "../movie-view/movie-view";
 
 const MainView = () => {
   const [movies, setMovies] = useState([]);
+  const apiUrl = process.env.MONGODB_URI;
 
   useEffect(() => {
     /* USE HEROKU URL */
-    fetch("https://openlibrary.org/search.json?q=star+wars")
+    fetch(`${apiUrl}/movies`)
     .then((response) => response.json())
     .then((data) => {
       const moviesFromApi = data.docs.map((doc) => {
