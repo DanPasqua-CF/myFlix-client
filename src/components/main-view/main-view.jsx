@@ -21,14 +21,22 @@ const MainView = () => {
     fetch(`${apiUrl}/movies`)
     .then((response) => response.json())
     .then((data) => {
-      const moviesFromApi = data.docs.map((doc) => {
-        return {
-          id: doc.key,
-          title: doc.title,
-          image: `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`,
-          director: doc.directors?.[0]
-        };
-      });
+      console.log(`Movies from API`, data);
+
+      if (!Array.isArray(data)) {
+        console.error("Unexpected API format", data);
+        return;
+      }
+
+      const moviesFromApi = data.map((doc) => ({
+        id: doc._id,
+        title: doc.title,
+        description: doc.description,
+        image: {
+          imageUrl: doc.imageUrl
+        },
+        directors: doc.directors || []
+      }));
       
       setMovies(moviesFromApi);
     });
