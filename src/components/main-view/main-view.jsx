@@ -10,7 +10,7 @@ const MainView = () => {
   const [user, setUser] = useState(storedUser? storedUser : null);
   const [token, setToken] = useState(storedToken? storedToken : null);
   const [movies, setMovies] = useState([]);
-  const apiUrl = process.env.MONGODB_URI;
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     if (!token) {

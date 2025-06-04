@@ -16,7 +16,9 @@ const SignupView = () => {
       Birthday: birthday
     };
 
-    fetch("SIGNUP_URL", {
+    const apiUrl = process.env.REACT_APP_API_URL;
+
+    fetch(`${apiUrl}/users`, {
       method: "POST",
       body: JSON.stringify(data),
       headers: {

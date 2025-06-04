@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { useState } from "react";
 
 const LoginView = ({ onLoggedIn }) => {
   const [username, setUsername] = useState("");
@@ -10,8 +10,9 @@ const LoginView = ({ onLoggedIn }) => {
       Username: username,
       Password: password
     };
+    const apiUrl = process.env.REACT_APP_API_URL;
 
-    fetch("YOUR_API_URL/login", {
+    fetch(`${apiUrl}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
