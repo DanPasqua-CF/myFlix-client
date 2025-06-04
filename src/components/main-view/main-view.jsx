@@ -10,7 +10,7 @@ const MainView = () => {
   const [user, setUser] = useState(storedUser? storedUser : null);
   const [token, setToken] = useState(storedToken? storedToken : null);
   const [movies, setMovies] = useState([]);
-  const [selectedMovie, setSelectedMovie] = useState(null);
+  const apiUrl = process.env.MONGODB_URI;
 
   useEffect(() => {
     if (!token) {
@@ -18,7 +18,7 @@ const MainView = () => {
     }
 
     /* USE HEROKU URL */
-    fetch("https://openlibrary.org/movies", { headers: { Authorization: `Bearer ${token}`}})
+    fetch(`${apiUrl}/movies`)
     .then((response) => response.json())
     .then((data) => {
       const moviesFromApi = data.docs.map((doc) => {
