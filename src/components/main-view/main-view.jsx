@@ -1,67 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MovieCard from "../movie-card/movie-card"
 import MovieView from "../movie-view/movie-view";
 
 const MainView = () => {
-  const [movies, setMovies] = useState([
-    {
-      id: 1,
-      title: 'Good Will Hunting',
-      genre: [ "Drama" ],
-      description: 'Will Hunting, a janitor at MIT, has a gift for mathematics, but needs help from a psychologist to find direction in his life.',
-      directors: [
-        {
-          name: 'Gus Van Sant',
-          biography: 'Gus Green Van Sant Jr. is an American filmmaker from Louisville, Kentucky.',
-          birthYear: 1952,
-          deathYear: null
-        }
-      ],
-      image: {
-        imageUrl: 'https://www.movieposters.com/cdn/shop/files/goodwillhunting.mpw.124427_480x.progressive.jpg?v=1707501307',
-        imageAttribution: 'MoviePosters.com'
-      },
-      featured: true
-    },
-    {
-      id: 2,
-      title: 'Goodfellas',
-      description: 'The story of Henry Hill and his life in the mafia, covering his relationship with his wife Karen and his mob partners Jimmy Conway and Tommy DeVito.',
-      genre: [ "Crime" ],
-      directors: [
-        {
-          name: 'Martin Scorsese',
-          biography: 'Martin Charles Scorsese was born in Queens, New York City.',
-          birthYear: 1942,
-          deathYear: null
-        }
-      ],
-      image: {
-        imageUrl: 'https://www.movieposters.com/cdn/shop/files/Goodfellas.mpw.116119_480x.progressive.jpg?v=1731338435',
-        imageAttribution: 'MoviePosters.com'
-      },
-      featured: true
-    },
-    {
-      id: 3,
-      title: 'Step Brothers',
-      genre: [ "Comedy" ],
-      description: 'Two aimless middle-aged losers still living at home are forced against their will to become roommates when their parents marry.',
-      directors: [
-        {
-        name: 'Adam McKay',
-        biography: 'Adam McKay is an American screenwriter, director, comedian, and actor.',
-        birthYear: 1968,
-        deathYear: null
-        }
-      ],
-      image: {
-        imageUrl: 'https://www.movieposters.com/cdn/shop/products/stepbrothers.mp_480x.progressive.jpg?v=1608672208',
-        imageAttribution: 'MoviePosters.com'
-      },
-      featured: true
-    }
-  ]);
+  const [movies, setMovies] = useState([]);
+  const apiUrl = process.env.MONGODB_URI;
+
+  useEffect(() => {
+    /* USE HEROKU URL */
+    fetch(`${apiUrl}/movies`)
+    .then((response) => response.json())
+    .then((data) => {
+      const moviesFromApi = data.docs.map((doc) => {
+        return {
+          id: doc.key,
+          title: doc.title,
+          image: `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`,
+          director: doc.directors?.[0]
+        };
+      });
+      
+      setMovies(moviesFromApi);
+    });
+  }, []);
 
   const [ selectedMovie, setSelectedMovie ] = useState(null);
 
