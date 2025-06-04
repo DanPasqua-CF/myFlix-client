@@ -1,9 +1,12 @@
+import PropTypes from "prop-types";
 const MovieView = ({ movie, onBackClick }) => {
   return (
     <>
-      <div>
-        <img src={movie.image.imageUrl} alt={movie.title} />
-      </div>
+      {movie.image.imageUrl ? (
+          <img src={movie.image.imageUrl} alt={movie.title} />
+        ) : (
+          <img src="/placeholder-image.jpg" alt="placeholder" />
+        )}
       <div>
         <strong>Title: </strong>
         {movie.title}
