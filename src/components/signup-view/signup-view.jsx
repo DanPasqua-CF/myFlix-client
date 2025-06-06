@@ -10,10 +10,10 @@ const SignupView = () => {
     event.preventDefault();
 
     const data = {
-      Username: username,
-      Password: password,
-      Email: email,
-      Birthday: birthday
+      username: username,
+      password: password,
+      email: email,
+      birthday: birthday
     };
 
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -45,7 +45,7 @@ const SignupView = () => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
-          minLength="3"
+          minLength="5"
         />
       </label>
       <label>
@@ -69,7 +69,7 @@ const SignupView = () => {
       <label>
         Birthday:
         <input 
-          type="birthday"
+          type="date"
           value={birthday}
           onChange={(e) => setBirthday(e.target.value)}
           required
