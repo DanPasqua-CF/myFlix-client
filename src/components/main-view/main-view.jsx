@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
+import { Col, Row } from "react-bootstrap";
 import MovieCard from "../movie-card/movie-card"
 import MovieView from "../movie-view/movie-view";
 import LoginView from "../login-view/login-view";
 import SignupView from "../signup-view/signup-view";
-import { Col, Row } from "react-bootstrap";
 
 const MainView = () => {
   const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -51,8 +51,6 @@ const MainView = () => {
     });
   }, [token]);
 
-
-
   return (
     <Row className="justify-content-md-center">
       {!user ? (
@@ -89,68 +87,6 @@ const MainView = () => {
       )}
     </Row>
   )
-
-
-
-
-//   if (!user) {
-//     return (
-//       <>
-//         <LoginView 
-//           onLoggedIn={(user, token) => {
-//             setUser(user);
-//             setToken(token);
-//           }} 
-//         />
-//         or
-//         <SignupView />
-//       </>
-//     );
-//   }
-
-//   if (selectedMovie) {
-//     return <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} />;
-//   }
-
-//   if (movies.length === 0) {
-//     return (
-//       <>
-//         <button
-//           onClick={() => {
-//             setUser(null);
-//             setToken(null);
-//             localStorage.clear();
-//           }}
-//         >
-//           Logout
-//         </button>
-//         <div>No movies listed</div>
-//       </>
-//     );
-//   };
-
-//   return (
-//     <>
-//       <div>
-//         {movies.map((movie) => (
-//           <MovieCard
-//             key={movie.id} 
-//             movie={movie} 
-//             onMovieClick={setSelectedMovie} 
-//           />
-//         ))}
-//       </div>
-//       <button
-//         onClick={() => {
-//           setUser(null);
-//           setToken(null);
-//           localStorage.clear();
-//         }}
-//       >
-//         Logout
-//       </button>
-//     </>
-//   );
 };
 
 export default MainView;
