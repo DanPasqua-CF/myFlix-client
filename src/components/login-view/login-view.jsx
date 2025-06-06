@@ -7,8 +7,8 @@ const LoginView = ({ onLoggedIn }) => {
     event.preventDefault();
 
     const data = {
-      Username: username,
-      Password: password
+      username: username,
+      password: password
     };
     const apiUrl = process.env.REACT_APP_API_URL;
 
