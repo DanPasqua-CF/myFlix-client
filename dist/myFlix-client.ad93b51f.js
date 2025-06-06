@@ -16130,11 +16130,19 @@ const MainView = ()=>{
     const [user, setUser] = (0, _react.useState)(storedUser ? storedUser : null);
     const [token, setToken] = (0, _react.useState)(storedToken ? storedToken : null);
     const [movies, setMovies] = (0, _react.useState)([]);
+    const [selectedMovie, setSelectedMovie] = (0, _react.useState)(null);
     const apiUrl = "https://movie-project-flix-fb8ed415ea47.herokuapp.com";
     (0, _react.useEffect)(()=>{
         if (!token) return;
-        /* USE HEROKU URL */ fetch(`${apiUrl}/movies`).then((response)=>response.json()).then((data)=>{
-            console.log(`Movies from API`, data);
+        /* USE HEROKU URL */ fetch(`${apiUrl}/movies`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }).then((response)=>{
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        }).then((data)=>{
+            console.log("Movies from API:", data);
             if (!Array.isArray(data)) {
                 console.error("Unexpected API format", data);
                 return;
@@ -16162,13 +16170,13 @@ const MainView = ()=>{
                 }
             }, void 0, false, {
                 fileName: "src/components/main-view/main-view.jsx",
-                lineNumber: 48,
+                lineNumber: 57,
                 columnNumber: 9
             }, undefined),
             "or",
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _signupViewDefault.default), {}, void 0, false, {
                 fileName: "src/components/main-view/main-view.jsx",
-                lineNumber: 54,
+                lineNumber: 64,
                 columnNumber: 9
             }, undefined)
         ]
@@ -16178,24 +16186,10 @@ const MainView = ()=>{
         onBackClick: ()=>setSelectedMovie(null)
     }, void 0, false, {
         fileName: "src/components/main-view/main-view.jsx",
-        lineNumber: 60,
+        lineNumber: 70,
         columnNumber: 12
     }, undefined);
     if (movies.length === 0) return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
-        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
-            onClick: ()=>{
-                setUser(null);
-                setToken(null);
-                localStorage.clear();
-            },
-            children: "Logout"
-        }, void 0, false, {
-            fileName: "src/components/main-view/main-view.jsx",
-            lineNumber: 66,
-            columnNumber: 9
-        }, undefined)
-    }, void 0, false);
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
         children: [
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
                 onClick: ()=>{
@@ -16206,23 +16200,50 @@ const MainView = ()=>{
                 children: "Logout"
             }, void 0, false, {
                 fileName: "src/components/main-view/main-view.jsx",
-                lineNumber: 81,
+                lineNumber: 76,
+                columnNumber: 9
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                children: "No movies listed"
+            }, void 0, false, {
+                fileName: "src/components/main-view/main-view.jsx",
+                lineNumber: 85,
+                columnNumber: 9
+            }, undefined)
+        ]
+    }, void 0, true);
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
+        children: [
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                children: movies.map((movie)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieViewDefault.default), {
+                        movie: movie,
+                        onMovieClick: setSelectedMovie
+                    }, movie.id, false, {
+                        fileName: "src/components/main-view/main-view.jsx",
+                        lineNumber: 94,
+                        columnNumber: 11
+                    }, undefined))
+            }, void 0, false, {
+                fileName: "src/components/main-view/main-view.jsx",
+                lineNumber: 92,
                 columnNumber: 7
             }, undefined),
-            movies.map((movie)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieCardDefault.default), {
-                    movie: movie,
-                    onMovieClick: (newSelectedMovie)=>{
-                        setSelectedMovie(newSelectedMovie);
-                    }
-                }, movie.id, false, {
-                    fileName: "src/components/main-view/main-view.jsx",
-                    lineNumber: 91,
-                    columnNumber: 9
-                }, undefined))
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
+                onClick: ()=>{
+                    setUser(null);
+                    setToken(null);
+                    localStorage.clear();
+                },
+                children: "Logout"
+            }, void 0, false, {
+                fileName: "src/components/main-view/main-view.jsx",
+                lineNumber: 101,
+                columnNumber: 7
+            }, undefined)
         ]
     }, void 0, true);
 };
-_s(MainView, "/WjM596oF0v9y9togmgRao9XFtw=");
+_s(MainView, "skShail9kO25ilQX788tJ78Yq3c=");
 _c = MainView;
 exports.default = MainView;
 var _c;
@@ -16248,17 +16269,25 @@ var _propTypes = require("prop-types");
 var _propTypesDefault = parcelHelpers.interopDefault(_propTypes);
 const MovieCard = ({ movie, onMovieClick })=>{
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-        onClick: ()=>{
-            onMovieClick(movie);
-        },
-        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("strong", {
-            children: movie.title
-        }, void 0, false, {
-            fileName: "src/components/movie-card/movie-card.jsx",
-            lineNumber: 10,
-            columnNumber: 7
-        }, undefined)
-    }, void 0, false, {
+        onClick: ()=>onMovieClick(movie),
+        children: [
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
+                src: movie.image?.imageUrl || "/placeholder-image.jpg",
+                alt: movie.title
+            }, void 0, false, {
+                fileName: "src/components/movie-card/movie-card.jsx",
+                lineNumber: 8,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("strong", {
+                children: movie.title
+            }, void 0, false, {
+                fileName: "src/components/movie-card/movie-card.jsx",
+                lineNumber: 12,
+                columnNumber: 7
+            }, undefined)
+        ]
+    }, void 0, true, {
         fileName: "src/components/movie-card/movie-card.jsx",
         lineNumber: 5,
         columnNumber: 5
@@ -16267,9 +16296,13 @@ const MovieCard = ({ movie, onMovieClick })=>{
 _c = MovieCard;
 MovieCard.propTypes = {
     movie: (0, _propTypesDefault.default).shape({
+        id: (0, _propTypesDefault.default).string.isRequired,
         title: (0, _propTypesDefault.default).string.isRequired,
-        description: (0, _propTypesDefault.default).string.isRequired
-    }),
+        description: (0, _propTypesDefault.default).string.isRequired,
+        image: (0, _propTypesDefault.default).shape({
+            imageUrl: (0, _propTypesDefault.default).string
+        })
+    }).isRequired,
     onMovieClick: (0, _propTypesDefault.default).func.isRequired
 };
 exports.default = MovieCard;
@@ -19352,20 +19385,20 @@ var _propTypesDefault = parcelHelpers.interopDefault(_propTypes);
 const MovieView = ({ movie, onBackClick })=>{
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
         children: [
-            movie.image.imageUrl ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
+            movie.image?.imageUrl ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
                 src: movie.image.imageUrl,
                 alt: movie.title
             }, void 0, false, {
                 fileName: "src/components/movie-view/movie-view.jsx",
                 lineNumber: 7,
-                columnNumber: 11
+                columnNumber: 9
             }, undefined) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
                 src: "/placeholder-image.jpg",
                 alt: "placeholder"
             }, void 0, false, {
                 fileName: "src/components/movie-view/movie-view.jsx",
                 lineNumber: 9,
-                columnNumber: 11
+                columnNumber: 9
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
                 children: [
@@ -19408,7 +19441,7 @@ const MovieView = ({ movie, onBackClick })=>{
                         lineNumber: 20,
                         columnNumber: 9
                     }, undefined),
-                    movie.directors.map((director)=>director.name).join(", ")
+                    movie.directors?.map((director)=>director.name).join(", ")
                 ]
             }, void 0, true, {
                 fileName: "src/components/movie-view/movie-view.jsx",
@@ -19430,8 +19463,13 @@ _c = MovieView;
 MovieView.propTypes = {
     movie: (0, _propTypesDefault.default).shape({
         title: (0, _propTypesDefault.default).string.isRequired,
-        image: (0, _propTypesDefault.default).string.isRequired,
-        directors: (0, _propTypesDefault.default).string.isRequired
+        description: (0, _propTypesDefault.default).string.isRequired,
+        image: (0, _propTypesDefault.default).shape({
+            imageUrl: (0, _propTypesDefault.default).string
+        }),
+        directors: (0, _propTypesDefault.default).arrayOf((0, _propTypesDefault.default).shape({
+            name: (0, _propTypesDefault.default).string
+        }))
     }).isRequired,
     onBackClick: (0, _propTypesDefault.default).func.isRequired
 };

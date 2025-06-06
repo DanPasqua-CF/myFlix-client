@@ -10,6 +10,7 @@ const MainView = () => {
   const [user, setUser] = useState(storedUser? storedUser : null);
   const [token, setToken] = useState(storedToken? storedToken : null);
   const [movies, setMovies] = useState([]);
+  const [selectedMovie, setSelectedMovie] = useState(null);
   const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
@@ -18,11 +19,19 @@ const MainView = () => {
     }
 
     /* USE HEROKU URL */
-    fetch(`${apiUrl}/movies`)
-    .then((response) => response.json())
+    fetch(`${apiUrl}/movies`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then((data) => {
-      console.log(`Movies from API`, data);
-
+      console.log("Movies from API:", data);
       if (!Array.isArray(data)) {
         console.error("Unexpected API format", data);
         return;
@@ -49,7 +58,8 @@ const MainView = () => {
           onLoggedIn={(user, token) => {
             setUser(user);
             setToken(token);
-          }} />
+          }} 
+        />
         or
         <SignupView />
       </>
@@ -57,7 +67,7 @@ const MainView = () => {
   }
 
   if (selectedMovie) {
-    return <MovieView movie = { selectedMovie } onBackClick={() => setSelectedMovie(null)} />;
+    return <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} />;
   }
 
   if (movies.length === 0) {
@@ -72,12 +82,22 @@ const MainView = () => {
         >
           Logout
         </button>
+        <div>No movies listed</div>
       </>
     );
   };
 
   return (
     <>
+      <div>
+        {movies.map((movie) => (
+          <MovieView 
+            key={movie.id} 
+            movie={movie} 
+            onMovieClick={setSelectedMovie} 
+          />
+        ))}
+      </div>
       <button
         onClick={() => {
           setUser(null);
@@ -87,15 +107,6 @@ const MainView = () => {
       >
         Logout
       </button>
-      {movies.map((movie) => (
-        <MovieCard
-          key={movie.id}
-          movie={movie}
-          onMovieClick={(newSelectedMovie) => {
-            setSelectedMovie(newSelectedMovie);
-          }}
-        />
-      ))}
     </>
   );
 };
