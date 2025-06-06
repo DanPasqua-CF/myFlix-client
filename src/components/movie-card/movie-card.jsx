@@ -7,7 +7,7 @@ const MovieCard = ({ movie, onMovieClick }) => {
       <Card.Img variant="top" src={movie.image} />
       <Card.Body>
         <Card.Title>{movie.title}</Card.Title>
-        <Card.Text>{movie.directors}</Card.Text>
+        <Card.Text>{movie.directors.map((d) => d.name).join(", ")}</Card.Text>
         <Button onClick={() => onMovieClick(movie)} variant="link">
           Open
         </Button>

@@ -8,8 +8,8 @@ import SignupView from "../signup-view/signup-view";
 const MainView = () => {
   const storedUser = JSON.parse(localStorage.getItem('user'));
   const storedToken = localStorage.getItem('token');
-  const [user, setUser] = useState(storedUser? storedUser : null);
-  const [token, setToken] = useState(storedToken? storedToken : null);
+  const [user, setUser] = useState(storedUser ? storedUser : null);
+  const [token, setToken] = useState(storedToken ? storedToken : null);
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -25,6 +25,15 @@ const MainView = () => {
       }
     })
     .then((response) => {
+      if (response.status === 401 || response.status === 403) {
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+
+        return;
+      }
+      
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -56,10 +65,11 @@ const MainView = () => {
       {!user ? (
         <Col md={5}>
           <LoginView 
-          onLoggedIn={(user) => { 
+          onLoggedIn={(user, token) => { 
             setUser(user); 
             setToken(token); 
-            localStorage.clear(); 
+            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('token', token);
           }} 
           />
           or
@@ -73,7 +83,7 @@ const MainView = () => {
         <div>The list is empty</div>
       ) : (
         <>
-          {movies.map((movie) => {
+          {movies.map((movie) => (
             <Col className="mb-5" key={movie.id} md={3}>
               <MovieCard 
                 movie={movie} 
@@ -82,7 +92,7 @@ const MainView = () => {
                 }} 
               />
             </Col>
-          })}
+          ))}
         </>
       )}
     </Row>
