@@ -12,6 +12,7 @@ const MainView = () => {
   const [token, setToken] = useState(storedToken? storedToken : null);
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     if (!token) {
@@ -19,17 +20,33 @@ const MainView = () => {
     }
 
     /* USE HEROKU URL */
-    fetch("https://openlibrary.org/movies", { headers: { Authorization: `Bearer ${token}`}})
-    .then((response) => response.json())
+    fetch(`${apiUrl}/movies`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then((data) => {
-      const moviesFromApi = data.docs.map((doc) => {
-        return {
-          id: doc.key,
-          title: doc.title,
-          image: `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`,
-          director: doc.directors?.[0]
-        };
-      });
+      console.log("Movies from API:", data);
+      if (!Array.isArray(data)) {
+        console.error("Unexpected API format", data);
+        return;
+      }
+
+      const moviesFromApi = data.map((doc) => ({
+        id: doc._id,
+        title: doc.title,
+        description: doc.description,
+        image: {
+          imageUrl: doc.imageUrl
+        },
+        directors: doc.directors || []
+      }));
       
       setMovies(moviesFromApi);
     });
@@ -93,7 +110,7 @@ const MainView = () => {
   }
 
   if (selectedMovie) {
-    return <MovieView movie = { selectedMovie } onBackClick={() => setSelectedMovie(null)} />;
+    return <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} />;
   }
 
   if (movies.length === 0) {
@@ -108,12 +125,22 @@ const MainView = () => {
         >
           Logout
         </button>
+        <div>No movies listed</div>
       </>
     );
   };
 
   return (
     <>
+      <div>
+        {movies.map((movie) => (
+          <MovieCard
+            key={movie.id} 
+            movie={movie} 
+            onMovieClick={setSelectedMovie} 
+          />
+        ))}
+      </div>
       <button
         onClick={() => {
           setUser(null);
@@ -123,15 +150,6 @@ const MainView = () => {
       >
         Logout
       </button>
-      {movies.map((movie) => (
-        <MovieCard
-          key={movie.id}
-          movie={movie}
-          onMovieClick={(newSelectedMovie) => {
-            setSelectedMovie(newSelectedMovie);
-          }}
-        />
-      ))}
     </>
   );
 };

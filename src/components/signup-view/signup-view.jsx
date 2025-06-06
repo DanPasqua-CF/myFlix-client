@@ -11,13 +11,15 @@ const SignupView = () => {
     event.preventDefault();
 
     const data = {
-      Username: username,
-      Password: password,
-      Email: email,
-      Birthday: birthday
+      username: username,
+      password: password,
+      email: email,
+      birthday: birthday
     };
 
-    fetch("SIGNUP_URL", {
+    const apiUrl = process.env.REACT_APP_API_URL;
+
+    fetch(`${apiUrl}/users`, {
       method: "POST",
       body: JSON.stringify(data),
       headers: {
@@ -44,7 +46,7 @@ const SignupView = () => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
-          minLength="3"
+          minLength="5"
         />
       </Form.Group>
     
