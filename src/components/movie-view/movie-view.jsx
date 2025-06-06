@@ -4,7 +4,7 @@ const MovieView = ({ movie, onBackClick }) => {
   return (
     <>
       {movie.image?.imageUrl ? (
-        <img src={movie.image.imageUrl} alt={movie.title} />
+        <img src={movie.image.imageUrl} alt={movie.title} height={350} width={250} />
       ) : (
         <img src="/placeholder-image.jpg" alt="placeholder" />
       )}
