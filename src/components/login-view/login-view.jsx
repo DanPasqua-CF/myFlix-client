@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { React, useState } from "react";
+import { useState } from "react";
 import { Button, FloatingLabel, Form } from "react-bootstrap";
 
 const LoginView = ({ onLoggedIn }) => {
@@ -12,11 +12,12 @@ const LoginView = ({ onLoggedIn }) => {
     event.preventDefault();
 
     const data = {
-      Username: username,
-      Password: password
+      username: username,
+      password: password
     };
+    const apiUrl = process.env.REACT_APP_API_URL;
 
-    fetch("YOUR_API_URL/login", {
+    fetch(`${apiUrl}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

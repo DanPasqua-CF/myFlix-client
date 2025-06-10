@@ -1,16 +1,20 @@
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
+
 import "./movie-view.scss";
 
 const MovieView = ({ movies }) => {
   const { movieId } = useParams();
   const movie = movies.find((m) => m.id === movieId);
 
+
   return (
     <>
-      <div>
-        <img className="w-100" src={movie.image.imageUrl} alt={movie.title} />
-      </div>
+      {movie.image?.imageUrl ? (
+        <img src={movie.image.imageUrl} alt={movie.title} height={350} width={250} />
+      ) : (
+        <img src="/placeholder-image.jpg" alt="placeholder" />
+      )}
       <div>
         <strong>Title: </strong>
         {movie.title}
@@ -21,7 +25,7 @@ const MovieView = ({ movies }) => {
       </div>
       <div>
         <strong>Director: </strong>
-        {movie.directors.map((director) => director.name).join(", ")}
+        {movie.directors?.map((director) => director.name).join(", ")}
       </div>
       <Link to={'/'}>
         <button className="back-button">Back</button>
@@ -33,8 +37,15 @@ const MovieView = ({ movies }) => {
 MovieView.propTypes = {
   movie: PropTypes.shape({
     title: PropTypes.string.isRequired,
-    image: PropTypes.string.isRequired,
-    directors: PropTypes.string.isRequired
+    description: PropTypes.string.isRequired,
+    image: PropTypes.shape({
+      imageUrl: PropTypes.string
+    }),
+    directors: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string
+      })
+    )
   }).isRequired,
 };
 

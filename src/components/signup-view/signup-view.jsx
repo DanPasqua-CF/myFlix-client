@@ -11,13 +11,15 @@ const SignupView = () => {
     event.preventDefault();
 
     const data = {
-      Username: username,
-      Password: password,
-      Email: email,
-      Birthday: birthday
+      username: username,
+      password: password,
+      email: email,
+      birthday: birthday
     };
 
-    fetch("SIGNUP_URL", {
+    const apiUrl = process.env.REACT_APP_API_URL;
+
+    fetch(`${apiUrl}/users`, {
       method: "POST",
       body: JSON.stringify(data),
       headers: {
@@ -44,14 +46,14 @@ const SignupView = () => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
-          minLength="3"
+          minLength="5"
         />
       </Form.Group>
     
       <Form.Group controlId="formPassword">
         <Form.Label>Password:</Form.Label>
         <Form.Control
-          type="text"
+          type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -61,7 +63,7 @@ const SignupView = () => {
       <Form.Group controlId="formEmail">
         <Form.Label>Email:</Form.Label>
         <Form.Control
-          type="text"
+          type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -71,7 +73,7 @@ const SignupView = () => {
       <Form.Group controlId="formBirthday">
         <Form.Label>Birthday:</Form.Label>
         <Form.Control
-          type="text"
+          type="date"
           value={birthday}
           onChange={(e) => setBirthday(e.target.value)}
           required
