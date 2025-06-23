@@ -15,7 +15,7 @@ const MainView = () => {
   const [user, setUser] = useState(storedUser ? storedUser : null);
   const [token, setToken] = useState(storedToken ? storedToken : null);
   const [movies, setMovies] = useState([]);
-  const [searchQuery, setSearchQuery] = useState(""); // 🔍 Search state
+  const [searchQuery, setSearchQuery] = useState("");
 
   const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -62,7 +62,6 @@ const MainView = () => {
       });
   }, [token]);
 
-  // 🔍 Filter movies based on search query
   const filteredMovies = movies.filter((movie) =>
     movie.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -78,7 +77,7 @@ const MainView = () => {
           localStorage.removeItem('user');
           localStorage.removeItem('token');
         }}
-        searchQuery={searchQuery}       // 🔍 Pass to NavigationBar
+        searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
 
@@ -103,8 +102,13 @@ const MainView = () => {
                 user ? (
                   <Navigate to="/" />
                 ) : (
-                  <Col>
-                    <LoginView onLoggedIn={(user) => setUser(user)} />
+                  <Col md={5}>
+                    <LoginView onLoggedIn={(user, token) => {
+                      setUser(user);
+                      setToken(token);
+                      localStorage.setItem('user', JSON.stringify(user));
+                      localStorage.setItem('token', token);
+                    }} />
                   </Col>
                 )
               }
