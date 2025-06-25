@@ -11,7 +11,6 @@ import "./main-view.scss";
 const MainView = () => {
   const storedUser = JSON.parse(localStorage.getItem('user'));
   const storedToken = localStorage.getItem('token');
-
   const [user, setUser] = useState(storedUser ? storedUser : null);
   const [token, setToken] = useState(storedToken ? storedToken : null);
   const [movies, setMovies] = useState([]);
@@ -43,6 +42,8 @@ const MainView = () => {
         return response.json();
       })
       .then((data) => {
+        console.log(`Movies from API: `, data);
+        
         if (!Array.isArray(data)) {
           console.error("Unexpected API format", data);
           return;

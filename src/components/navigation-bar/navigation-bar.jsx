@@ -15,6 +15,12 @@ const NavigationBar = ({ user, onLoggedOut, searchQuery, setSearchQuery }) => {
               </Nav.Item>
             )}
 
+            {user && ( 
+              <Nav.Item className="me-4">
+                <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
+              </Nav.Item>
+            )}
+
             {user && (
               <Nav.Item className="me-4">
                 <Nav.Link as={Link} to="https://github.com/DanPasqua-CF/myFlix-client">GitHub</Nav.Link>

@@ -1,24 +1,99 @@
-import { useState } from "react";
-import { Button, Form } from "react-bootstrap";
-import { MovieCard } from "../movie-card/movie-card";
+import { useEffect, useState } from "react";
+import { Card, Col, Container, Row } from "react-bootstrap";
+import favoriteMovies, { FavoriteMovies } from "./favorite-movies";
+import { UserInfo } from "./user-info";
+import { UpdateUser } from "./update-user";
+import { useNavigate } from "react-router";
 
 const ProfileView = ({ movies }) => {
-  const localUser = JSON.parse(localStorage.getItem("user"));
+  const apiUrl = process.env.REACT_APP_API_URL;
 
-  const [username, setUsername] = useState(localUser?.username || "");
+  const [user, setUser] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [email, setEmail] = useState(localUser?.email || "");
-  const [birthday, setBirthday] = useState(localUser?.birthday || "01/01/0001");
+  const [birthday, setBirthday] = useState("");
+  const [favoriteMovies, setFavoriteMovies] = useState([]);
+  const navigate = useNavigate();
 
-  if (!localUser) {
-    return <p>Log in to access your profile</p>
-  }
+  useEffect(() => {
+    if (user && token) {
+      fetch(`${apiUrl}/users/${user.username}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setUser(data);
+          setUsername(data.username);
+          setEmail(data.email);
+          setBirthday(data.birthday);
+          setFavoriteMovies(data.favoriteMovies || []);
+        })
+        .catch((error) => {
+          console.error(`Error retrieving user information: `, error);
+        });
+    }
+  }, [user, token]);
 
-  const favoriteMovies = movies.filter((movie) => {
-    return localUser.favoriteMovies?.includes(movies._id);
+  const favoriteMoviesList = movies.filter((movie) => {
+    return favoriteMovies.includes(movie._id) || [];
   });
 
-  const handleSubmit
+  const handleUpdate = (e) => {
+    e.preventDefault();
+
+    fetch(`${apiUrl}/users/${user.username}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+        email: email,
+        birthday: birthday,
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          alert("Profile updated");
+        } else {
+          alert("Update failed");
+        }
+      })
+      .catch((error) => {
+        console.error(`Update error: `, error);
+      });
+  };
+
+  return (
+    <Container>
+      <Row>
+        <Col xs={12} sm={4}>
+          <Card>
+            <Card.Body>
+              <UserInfo name={user.username} email={user.email} />
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col xs={12} sm={8}>
+          <Card>
+            <Card.Body>
+              <UpdateUser
+                handleSubmit={handleSubmit}
+                handleUpdate={handleUpdate}
+              />
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      <FavoriteMovies favoriteMoviesList={favoriteMoviesList} />
+    </Container>
+  );
 };
 
 export default ProfileView;
