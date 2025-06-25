@@ -33,8 +33,9 @@ const LoginView = ({ onLoggedIn }) => {
         alert('User does not exist');
       }
     })
-    .catch((e) => {
+    .catch((error) => {
       alert('Something went wrong');
+      console.log(error)
     });
   };
 
