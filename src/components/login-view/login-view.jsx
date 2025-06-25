@@ -13,40 +13,43 @@ const LoginView = ({ onLoggedIn }) => {
 
     const data = {
       username: username,
-      password: password
+      password: password,
     };
     const apiUrl = process.env.REACT_APP_API_URL;
 
     fetch(`${apiUrl}/login`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(`Login response: `, data);
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(`Login response: `, data);
 
-      if (data.user && data.token) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("token", data.token);
-        onLoggedIn(data.user, data.token);
-      }
-      else {
-        alert('User does not exist');
-      }
-    })
-    .catch((error) => {
-      alert('Something went wrong');
-      console.error(`Login error: ${error}`);
-    });
+        if (data.user && data.token) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+          localStorage.setItem("token", data.token);
+          onLoggedIn(data.user, data.token);
+        } else {
+          alert("User does not exist");
+        }
+      })
+      .catch((error) => {
+        alert("Something went wrong");
+        console.error(`Login error: ${error}`);
+      });
   };
 
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Group controlId="formUsername">
-        <FloatingLabel controlId="floatingUsername" label="Username" className="mb-3">
+        <FloatingLabel
+          controlId="floatingUsername"
+          label="Username"
+          className="mb-3"
+        >
           <Form.Control
             type="text"
             placeholder="username"
@@ -70,13 +73,15 @@ const LoginView = ({ onLoggedIn }) => {
           />
         </FloatingLabel>
       </Form.Group>
-      <Button variant="primary" type="submit" disabled={isButtonDisabled}>Submit</Button>
+      <Button variant="primary" type="submit" disabled={isButtonDisabled}>
+        Submit
+      </Button>
     </Form>
   );
 };
 
 LoginView.propTypes = {
-  onLoggedIn: PropTypes.func.isRequired
-}
+  onLoggedIn: PropTypes.func.isRequired,
+};
 
 export default LoginView;
