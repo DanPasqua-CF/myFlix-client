@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
+import { Col, Row } from "react-bootstrap";
 import MovieCard from "../movie-card/movie-card"
 import MovieView from "../movie-view/movie-view";
 import LoginView from "../login-view/login-view";
 import SignupView from "../signup-view/signup-view";
+import './main-view.scss'
 
 const MainView = () => {
   const storedUser = JSON.parse(localStorage.getItem('user'));
   const storedToken = localStorage.getItem('token');
-  const [user, setUser] = useState(storedUser? storedUser : null);
-  const [token, setToken] = useState(storedToken? storedToken : null);
+  const [user, setUser] = useState(storedUser ? storedUser : null);
+  const [token, setToken] = useState(storedToken ? storedToken : null);
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -18,13 +20,21 @@ const MainView = () => {
       return;
     }
 
-    /* USE HEROKU URL */
     fetch(`${apiUrl}/movies`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
     .then((response) => {
+      if (response.status === 401 || response.status === 403) {
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+
+        return;
+      }
+      
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -51,63 +61,59 @@ const MainView = () => {
     });
   }, [token]);
 
-  if (!user) {
-    return (
-      <>
-        <LoginView 
-          onLoggedIn={(user, token) => {
-            setUser(user);
-            setToken(token);
-          }} 
-        />
-        or
-        <SignupView />
-      </>
-    );
-  }
-
-  if (selectedMovie) {
-    return <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} />;
-  }
-
-  if (movies.length === 0) {
-    return (
-      <>
-        <button
-          onClick={() => {
-            setUser(null);
-            setToken(null);
-            localStorage.clear();
-          }}
-        >
-          Logout
-        </button>
-        <div>No movies listed</div>
-      </>
-    );
-  };
-
   return (
-    <>
-      <div>
-        {movies.map((movie) => (
-          <MovieCard
-            key={movie.id} 
-            movie={movie} 
-            onMovieClick={setSelectedMovie} 
+    <div className="main-view-container">
+      <Row className="justify-content-md-center flex-grow-1">
+        {!user ? (
+          <Col md={4}>
+            <LoginView 
+              onLoggedIn={(user, token) => { 
+              setUser(user); 
+              setToken(token); 
+              localStorage.setItem('user', JSON.stringify(user));
+              localStorage.setItem('token', token);
+            }} 
           />
-        ))}
-      </div>
-      <button
-        onClick={() => {
-          setUser(null);
-          setToken(null);
-          localStorage.clear();
-        }}
-      >
-        Logout
-      </button>
-    </>
+          or
+          <SignupView />
+          </Col>
+        ) : selectedMovie ? (
+          <Col>
+            <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} />
+          </Col>
+        ): movies.length === 0 ? (
+          <div>The list is empty</div>
+        ) : (
+          <>
+            {movies.map((movie) => (
+              <Col className="mb-4" key={movie.id} md={3}>
+                <MovieCard 
+                  movie={movie} 
+                  onMovieClick={(newSelectedMovie) => {
+                    setSelectedMovie(newSelectedMovie);
+                  }} 
+              />
+              </Col>
+            ))}
+          </>
+        )}
+      </Row>
+    
+      {user && (
+        <div className="logout-button-container">
+          <button
+            className="logout-button"
+            onClick={() => {
+              setUser(null);
+              setToken(null);
+              localStorage.clear();
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
 
