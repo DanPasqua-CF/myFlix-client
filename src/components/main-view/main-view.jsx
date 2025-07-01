@@ -65,7 +65,7 @@ const MainView = () => {
   }, [token]);
 
   const filteredMovies = movies.filter((movie) => {
-    movie.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return movie.title.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
   return (
