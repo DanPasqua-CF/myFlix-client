@@ -1,10 +1,21 @@
+import { useParams } from "react-router";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import "./movie-view.scss";
 
-const MovieView = ({ movie, onBackClick }) => {
+const MovieView = ({ movies }) => {
+  const { movieId } = useParams();
+  const movie = movies.find((m) => m.id === movieId);
+
   return (
     <>
       {movie.image?.imageUrl ? (
-        <img src={movie.image.imageUrl} alt={movie.title} height={350} width={250} />
+        <img
+          src={movie.image.imageUrl}
+          alt={movie.title}
+          height={350}
+          width={250}
+        />
       ) : (
         <img src="/placeholder-image.jpg" alt="placeholder" />
       )}
@@ -20,7 +31,9 @@ const MovieView = ({ movie, onBackClick }) => {
         <strong>Director: </strong>
         {movie.directors?.map((director) => director.name).join(", ")}
       </div>
-      <button onClick={onBackClick} className="back-button" style={{ cursor: "pointer" }}>Back</button>
+      <Link to={"/"}>
+        <button className="back-button">Back</button>
+      </Link>
     </>
   );
 };
@@ -30,15 +43,14 @@ MovieView.propTypes = {
     title: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     image: PropTypes.shape({
-      imageUrl: PropTypes.string
+      imageUrl: PropTypes.string,
     }),
     directors: PropTypes.arrayOf(
       PropTypes.shape({
-        name: PropTypes.string
+        name: PropTypes.string,
       })
-    )
+    ),
   }).isRequired,
-  onBackClick: PropTypes.func.isRequired
 };
 
 export default MovieView;
