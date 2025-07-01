@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import MovieCard from "../movie-card/movie-card";
 import MovieView from "../movie-view/movie-view";
 import NavigationBar from "../navigation-bar/navigation-bar";
@@ -8,7 +8,7 @@ import ProfileView from "../profile-view/profile-view";
 import PropTypes from "prop-types";
 import "./main-view.scss";
 
-const MainView = () => {
+const MainView = ({ user, token, onLoggedOut }) => {
   const [movies, setMovies] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -65,11 +65,7 @@ const MainView = () => {
     <>
       <NavigationBar
         user={user}
-        onLoggedOut={() => {
-          setUser(null);
-          setToken(null);
-          localStorage.clear();
-        }}
+        onLoggedOut={onLoggedOut}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
@@ -131,6 +127,12 @@ const MainView = () => {
       </div>
     </>
   );
+};
+
+MainView.propTypes = {
+  user: PropTypes.object.isRequired,
+  token: PropTypes.object.isRequired,
+  onLoggedOut: PropTypes.object.isRequired,
 };
 
 export default MainView;

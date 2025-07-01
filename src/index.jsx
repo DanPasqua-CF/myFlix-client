@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import LoginView from "./components/login-view/login-view";
 import MainView from "./components/main-view/main-view";
@@ -32,6 +32,12 @@ const App = () => {
     console.log(`User logged successfully logged in: `, userData);
   };
 
+  const handleLogout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.clear();
+  };
+
   return (
     <BrowserRouter>
       <Container className="mt-4">
@@ -52,7 +58,17 @@ const App = () => {
           />
           <Route
             path="/*"
-            element={user ? <MainView /> : <Navigate to="/login" replace />}
+            element={
+              user ? (
+                <MainView
+                  user={user}
+                  token={token}
+                  onLoggedOut={handleLogout}
+                />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
           />
         </Routes>
       </Container>
