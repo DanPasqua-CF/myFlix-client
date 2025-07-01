@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Container from "react-bootstrap/Container";
@@ -9,12 +10,24 @@ import "./index.scss";
 import { useState } from "react";
 
 const App = () => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const storedToken = localStorage.getItem("token");
+  const [user, setUser] = useState(storedUser || null);
+  const [token, setToken] = useState(storedToken || null);
+
+  useEffect(() => {
+    if (storedUser && storedToken) {
+      setUser(storedUser);
+      setToken(storedToken);
+    }
+  }, []);
 
   const handleLoggedIn = (userData, tokenData) => {
     setUser(userData);
     setToken(tokenData);
+
+    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("token", tokenData);
 
     console.log(`User logged successfully logged in: `, userData);
   };
@@ -23,12 +36,24 @@ const App = () => {
     <BrowserRouter>
       <Container className="mt-4">
         <Routes>
-          <Route path="/*" element={<MainView />} />
           <Route
             path="/login"
-            element={<LoginView onLoggedIn={handleLoggedIn} />}
+            element={
+              user ? (
+                <Navigate to="/" replace />
+              ) : (
+                <LoginView onLoggedIn={handleLoggedIn} />
+              )
+            }
           />
-          <Route path="/users" element={<SignupView />} />
+          <Route
+            path="/users"
+            element={user ? <Navigate to="/" replace /> : <SignupView />}
+          />
+          <Route
+            path="/*"
+            element={user ? <MainView /> : <Navigate to="/login" replace />}
+          />
         </Routes>
       </Container>
     </BrowserRouter>

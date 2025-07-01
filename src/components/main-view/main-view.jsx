@@ -5,13 +5,10 @@ import MovieCard from "../movie-card/movie-card";
 import MovieView from "../movie-view/movie-view";
 import NavigationBar from "../navigation-bar/navigation-bar";
 import ProfileView from "../profile-view/profile-view";
+import PropTypes from "prop-types";
 import "./main-view.scss";
 
 const MainView = () => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const storedToken = localStorage.getItem("token");
-  const [user, setUser] = useState(storedUser ? storedUser : null);
-  const [token, setToken] = useState(storedToken ? storedToken : null);
   const [movies, setMovies] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -26,9 +23,7 @@ const MainView = () => {
     })
       .then((response) => {
         if (response.status === 401 || response.status === 403) {
-          setUser(null);
-          setToken(null);
-          localStorage.clear();
+          onLoggedOut();
           return;
         }
 
@@ -56,6 +51,9 @@ const MainView = () => {
         }));
 
         setMovies(moviesFromApi);
+      })
+      .catch((error) => {
+        console.error("Error returning movies: ", error);
       });
   }, [token]);
 
@@ -82,9 +80,7 @@ const MainView = () => {
             <Route
               path="/movies/:movieId"
               element={
-                !user ? (
-                  <Navigate to="/login" replace />
-                ) : movies.length === 0 ? (
+                movies.length === 0 ? (
                   <Col>The list is empty!</Col>
                 ) : (
                   <Col md={8}>
@@ -96,21 +92,15 @@ const MainView = () => {
             <Route
               path="/users/:username"
               element={
-                !user ? (
-                  <Navigate to="/login" replace />
-                ) : (
-                  <Col md={8}>
-                    <ProfileView />
-                  </Col>
-                )
+                <Col md={8}>
+                  <ProfileView />
+                </Col>
               }
             />
             <Route
               path="/"
               element={
-                !user ? (
-                  <Navigate to="/login" replace />
-                ) : movies.length === 0 ? (
+                movies.length === 0 ? (
                   <Col>The list is empty!</Col>
                 ) : (
                   <>
