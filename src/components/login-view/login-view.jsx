@@ -8,6 +8,7 @@ import {
   Form,
   Row,
 } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import SignupView from "../signup-view/signup-view";
 
@@ -16,6 +17,7 @@ const LoginView = ({ onLoggedIn }) => {
   const [password, setPassword] = useState("");
 
   const isButtonDisabled = username.trim() === "" || password.trim() === "";
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -41,6 +43,7 @@ const LoginView = ({ onLoggedIn }) => {
           localStorage.setItem("user", JSON.stringify(data.user));
           localStorage.setItem("token", data.token);
           onLoggedIn(data.user, data.token);
+          navigate("/");
         } else {
           alert("User does not exist");
         }

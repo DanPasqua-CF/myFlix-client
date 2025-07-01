@@ -25,7 +25,7 @@ const App = () => {
     <BrowserRouter>
       <Container className="mt-4">
         <Routes>
-          <Route path="/" element={<MainView />} />
+          <Route path="*" element={<MainView />} />
           <Route
             path="/login"
             element={<LoginView onLoggedIn={handleLoggedIn} />}
