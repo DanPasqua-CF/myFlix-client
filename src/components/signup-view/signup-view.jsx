@@ -1,11 +1,20 @@
 import { useState } from "react";
-import { Button, FloatingLabel, Form } from "react-bootstrap";
+import { Button, Col, FloatingLabel, Form, Row } from "react-bootstrap";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "./signup-view.scss";
 
 const SignupView = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [birthday, setBirthday] = useState("");
+
+  const isButtonDisabled =
+    username.trim() === "" ||
+    password.trim() === "" ||
+    email.trim() === "" ||
+    !birthday;
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -14,7 +23,7 @@ const SignupView = () => {
       username: username,
       password: password,
       email: email,
-      birthday: birthday,
+      birthday: birthday ? birthday.toISOString().split("T")[0] : "",
     };
 
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -37,8 +46,8 @@ const SignupView = () => {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Form.Group controlId="formUsername">
-        <FloatingLabel>
+      <Form.Group controlId="formUsername" className="mb-3">
+        <FloatingLabel controlId="floatingSignupUsername" label="Username">
           <Form.Control
             type="text"
             placeholder="username"
@@ -50,8 +59,8 @@ const SignupView = () => {
         </FloatingLabel>
       </Form.Group>
 
-      <Form.Group controlId="formPassword">
-        <FloatingLabel>
+      <Form.Group controlId="formUsername" className="mb-3">
+        <FloatingLabel controlId="floatingSignupPassword" label="Password">
           <Form.Control
             type="password"
             placeholder="password"
@@ -63,8 +72,8 @@ const SignupView = () => {
         </FloatingLabel>
       </Form.Group>
 
-      <Form.Group controlId="formEmail">
-        <FloatingLabel>
+      <Form.Group controlId="formEmail" className="mb-3">
+        <FloatingLabel controlId="floatingEmail" label="Email address">
           <Form.Control
             type="email"
             placeholder="email"
@@ -75,18 +84,34 @@ const SignupView = () => {
         </FloatingLabel>
       </Form.Group>
 
-      <Form.Group controlId="formBirthday">
-        <FloatingLabel>
-          <Form.Control
-            type="date"
-            placeholder="birthday"
-            value={birthday}
-            onChange={(e) => setBirthday(e.target.value)}
+      <Form.Group controlId="formBirthday" className="mb-3">
+        <FloatingLabel
+          controlId="floatingBirthday"
+          label={birthday ? "" : "mm/dd/yyyy"}
+        >
+          <DatePicker
+            selected={birthday}
+            onChange={(date) => setBirthday(date)}
+            dateFormat="MM/dd/yyyy"
+            className="form-control"
+            placeholderText="mm/dd/yyyy"
             required
           />
         </FloatingLabel>
       </Form.Group>
-      <Button type="submit">Submit</Button>
+      <Row>
+        <Col>
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={isButtonDisabled}
+            className="w-25"
+            style={{ color: "#f0fff0" }}
+          >
+            Submit
+          </Button>
+        </Col>
+      </Row>
     </Form>
   );
 };

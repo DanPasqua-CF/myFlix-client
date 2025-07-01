@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Col, Row } from "react-bootstrap";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { Col, Nav, Row } from "react-bootstrap";
+import { Route, Routes, Navigate } from "react-router-dom";
 import LoginView from "../login-view/login-view";
 import MovieCard from "../movie-card/movie-card";
 import MovieView from "../movie-view/movie-view";
 import NavigationBar from "../navigation-bar/navigation-bar";
+import ProfileView from "../profile-view/profile-view";
 import SignupView from "../signup-view/signup-view";
 import "./main-view.scss";
 
@@ -68,7 +69,7 @@ const MainView = () => {
   });
 
   return (
-    <BrowserRouter>
+    <>
       <NavigationBar
         user={user}
         onLoggedOut={() => {
@@ -131,6 +132,18 @@ const MainView = () => {
               }
             />
             <Route
+              path="/users/:username"
+              element={
+                !user ? (
+                  <Navigate to="/login" replace />
+                ) : (
+                  <Col md={8}>
+                    <ProfileView />
+                  </Col>
+                )
+              }
+            />
+            <Route
               path="/"
               element={
                 !user ? (
@@ -152,10 +165,19 @@ const MainView = () => {
                 )
               }
             />
+            <Route
+              path="*"
+              element={
+                <Col md={8}>
+                  <h3>404 Page Not Found</h3>
+                  <p>The page you're looking for doesn't exist.</p>
+                </Col>
+              }
+            />
           </Routes>
         </Row>
       </div>
-    </BrowserRouter>
+    </>
   );
 };
 

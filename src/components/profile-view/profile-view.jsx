@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { data } from "react-router";
+import { FloatingLabel } from "react-bootstrap";
+import { useParams } from "react-router-dom";
 
 const ProfileView = () => {
+  const { username } = useParams();
   const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({ name: "", email: "" });
   const [loading, setLoading] = useState(true);
@@ -14,7 +16,7 @@ const ProfileView = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`${apiUrl}/users`, {
+        const response = await fetch(`${apiUrl}/users/${username}`, {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         });
@@ -48,7 +50,7 @@ const ProfileView = () => {
     setError(null);
 
     try {
-      const response = await fetch(`users/${data.user}`, {
+      const response = await fetch(`users/${username}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +77,7 @@ const ProfileView = () => {
 
   return (
     <Container className="mt-4" style={{ maxWidth: "600px" }}>
-      <h2 className="mb-4">Edit Profile</h2>
+      <h2 className="mb-4">Edit {username}'s profile'</h2>
 
       {error && <Alert variant="danger">{error}</Alert>}
       {success && (
@@ -84,25 +86,27 @@ const ProfileView = () => {
 
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="formName" className="mb-3">
-          <Form.Label>Name</Form.Label>
-          <Form.Control
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Enter your name"
-          />
+          <FloatingLabel>
+            <Form.Control
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Enter your name"
+            />
+          </FloatingLabel>
         </Form.Group>
 
         <Form.Group controlId="formEmail" className="mb-3">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Enter your email"
-          />
+          <FloatingLabel>
+            <Form.Control
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter your email"
+            />
+          </FloatingLabel>
         </Form.Group>
 
         <Button variant="primary" type="submit">
@@ -112,3 +116,5 @@ const ProfileView = () => {
     </Container>
   );
 };
+
+export default ProfileView;
