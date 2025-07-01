@@ -24,6 +24,12 @@ const MovieView = ({ movies }) => {
         {movie.title}
       </div>
       <div>
+        <strong>Genre: </strong>
+        {Array.isArray(movie.genre)
+          ? movie.genre.map((g) => g.name).join(", ")
+          : movie.genre?.name}
+      </div>
+      <div>
         <strong>Description: </strong>
         {movie.description}
       </div>
@@ -41,6 +47,7 @@ const MovieView = ({ movies }) => {
 MovieView.propTypes = {
   movie: PropTypes.shape({
     title: PropTypes.string.isRequired,
+    genre: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     image: PropTypes.shape({
       imageUrl: PropTypes.string,

@@ -43,6 +43,7 @@ const MainView = ({ user, token, onLoggedOut }) => {
         const moviesFromApi = data.map((doc) => ({
           id: doc._id,
           title: doc.title,
+          genre: doc.genre,
           description: doc.description,
           image: {
             imageUrl: doc.imageUrl,
