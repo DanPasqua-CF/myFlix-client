@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
-import { Col, Nav, Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import { Route, Routes, Navigate } from "react-router-dom";
-import LoginView from "../login-view/login-view";
 import MovieCard from "../movie-card/movie-card";
 import MovieView from "../movie-view/movie-view";
 import NavigationBar from "../navigation-bar/navigation-bar";
 import ProfileView from "../profile-view/profile-view";
-import SignupView from "../signup-view/signup-view";
 import "./main-view.scss";
 
 const MainView = () => {
@@ -15,7 +13,6 @@ const MainView = () => {
   const [user, setUser] = useState(storedUser ? storedUser : null);
   const [token, setToken] = useState(storedToken ? storedToken : null);
   const [movies, setMovies] = useState([]);
-  const [selectedMovie, setSelectedMovie] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -31,9 +28,7 @@ const MainView = () => {
         if (response.status === 401 || response.status === 403) {
           setUser(null);
           setToken(null);
-          localStorage.removeItem("user");
-          localStorage.removeItem("token");
-
+          localStorage.clear();
           return;
         }
 
@@ -76,8 +71,6 @@ const MainView = () => {
           setUser(null);
           setToken(null);
           localStorage.clear();
-          localStorage.removeItem("user");
-          localStorage.removeItem("token");
         }}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -86,37 +79,6 @@ const MainView = () => {
       <div className="main-view-container p-4">
         <Row className="justify-content-md-center flex-grow-1">
           <Routes>
-            <Route
-              path="/users"
-              element={
-                user ? (
-                  <Navigate to="/" />
-                ) : (
-                  <Col md={5}>
-                    <SignupView />
-                  </Col>
-                )
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                user ? (
-                  <Navigate to="/" />
-                ) : (
-                  <Col md={5}>
-                    <LoginView
-                      onLoggedIn={(user, token) => {
-                        setUser(user);
-                        setToken(token);
-                        localStorage.setItem("user", JSON.stringify(user));
-                        localStorage.setItem("token", token);
-                      }}
-                    />
-                  </Col>
-                )
-              }
-            />
             <Route
               path="/movies/:movieId"
               element={

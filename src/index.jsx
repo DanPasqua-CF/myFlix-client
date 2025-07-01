@@ -25,13 +25,11 @@ const App = () => {
     <BrowserRouter>
       <Container className="mt-4">
         <Routes>
-          <Route path="*" element={<MainView />} />
+          <Route path="/*" element={<MainView />} />
           <Route
             path="/login"
             element={<LoginView onLoggedIn={handleLoggedIn} />}
           />
-          <Route path="/movies" element={<MovieView />} />
-          <Route path="/users/:username" element={<ProfileView />} />
           <Route path="/users" element={<SignupView />} />
         </Routes>
       </Container>
