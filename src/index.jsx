@@ -3,8 +3,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import LoginView from "./components/login-view/login-view";
 import MainView from "./components/main-view/main-view";
-import MovieView from "./components/movie-view/movie-view";
-import ProfileView from "./components/profile-view/profile-view";
 import SignupView from "./components/signup-view/signup-view";
 
 import "./index.scss";
