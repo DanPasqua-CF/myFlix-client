@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import MovieCard from "../movie-card/movie-card";
 import MovieView from "../movie-view/movie-view";
 import NavigationBar from "../navigation-bar/navigation-bar";
 import ProfileView from "../profile-view/profile-view";
 import PropTypes from "prop-types";
 import "./main-view.scss";
+import UpdateUser from "../update-user/update-user";
 
-const MainView = ({ user, token, onLoggedOut }) => {
+const MainView = ({ user: initialUser, token, onLoggedOut }) => {
+  const [user, setUser] = useState(initialUser);
   const [movies, setMovies] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const apiUrl = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!token) return;
@@ -30,6 +33,7 @@ const MainView = ({ user, token, onLoggedOut }) => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
+
         return response.json();
       })
       .then((data) => {
@@ -57,6 +61,17 @@ const MainView = ({ user, token, onLoggedOut }) => {
         console.error("Error returning movies: ", error);
       });
   }, [token]);
+
+  const handlUserUpdate = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+  };
+
+  const handleUserDelete = () => {
+    onLoggedOut();
+    localStorage.clear();
+    navigate("/login");
+  };
 
   const filteredMovies = movies.filter((movie) => {
     return movie.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -90,7 +105,13 @@ const MainView = ({ user, token, onLoggedOut }) => {
               path="/users/:username"
               element={
                 <Col md={8}>
-                  <ProfileView />
+                  <ProfileView
+                    user={user}
+                    token={token}
+                    movies={movies}
+                    onUserUpdate={handlUserUpdate}
+                    onUserDelete={handleUserDelete}
+                  />
                 </Col>
               }
             />
@@ -99,18 +120,14 @@ const MainView = ({ user, token, onLoggedOut }) => {
               element={
                 movies.length === 0 ? (
                   <Col>The list is empty!</Col>
+                ) : filteredMovies.length === 0 ? (
+                  <Col>No movies found.</Col>
                 ) : (
-                  <>
-                    {filteredMovies.length === 0 ? (
-                      <Col>No movies found.</Col>
-                    ) : (
-                      filteredMovies.map((movie) => (
-                        <Col className="mb-4" key={movie.id} md={3}>
-                          <MovieCard movie={movie} />
-                        </Col>
-                      ))
-                    )}
-                  </>
+                  filteredMovies.map((movie) => (
+                    <Col className="mb-4" key={movie.id} md={3}>
+                      <MovieCard movie={movie} />
+                    </Col>
+                  ))
                 )
               }
             />

@@ -10,15 +10,18 @@ import "./index.scss";
 import { useState } from "react";
 
 const App = () => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const storedToken = localStorage.getItem("token");
-  const [user, setUser] = useState(storedUser || null);
-  const [token, setToken] = useState(storedToken || null);
+  const [user, setUser] = useState(() => {
+    return JSON.parse(localStorage.getItem("user")) || null;
+  });
+
+  const [token, setToken] = useState(() => {
+    return localStorage.getItem("token") || null;
+  });
 
   useEffect(() => {
-    if (storedUser && storedToken) {
-      setUser(storedUser);
-      setToken(storedToken);
+    if (user && token) {
+      setUser(user);
+      setToken(token);
     }
   }, []);
 
@@ -53,7 +56,7 @@ const App = () => {
             }
           />
           <Route
-            path="/users"
+            path="/signup"
             element={user ? <Navigate to="/" replace /> : <SignupView />}
           />
           <Route

@@ -1,56 +1,41 @@
-import React, { useEffect, useState } from "react";
-import { FloatingLabel } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import React, { useState } from "react";
+import {
+  Alert,
+  Button,
+  Col,
+  Container,
+  Form,
+  FloatingLabel,
+  Row,
+} from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import MovieCard from "../movie-card/movie-card";
 
-const ProfileView = () => {
-  const { username } = useParams();
-  const [user, setUser] = useState(null);
-  const [formData, setFormData] = useState({ name: "", email: "" });
-  const [loading, setLoading] = useState(true);
+const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    Username: user.Username || "",
+    Password: "",
+    Email: user.Email || "",
+    Birthday: user.Birthday ? user.Birthday.slice(0, 10) : "",
+  });
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch(`${apiUrl}/users/${username}`, {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch user data");
-        }
-
-        const data = await response.json();
-
-        setUser(data);
-        setFormData({ name: data.name || "", email: data.email || "" });
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, [token]);
-
-  const handleUpdate = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSuccess(false);
     setError(null);
+    setSuccess(false);
 
     try {
-      const response = await fetch(`users/${username}`, {
+      const response = await fetch(`${apiUrl}/users/${username}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -64,20 +49,52 @@ const ProfileView = () => {
       }
 
       const updatedUser = await response.json();
-
-      setUser(updatedUser);
       setSuccess(true);
+
+      if (onUserUpdate) {
+        onUserUpdate(updatedUser);
+      }
     } catch (err) {
       setError(err.message);
     }
   };
 
-  if (loading) return <p>Loading profile...</p>;
-  if (error) return <p>Error: {error}</p>;
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to continue?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}/users/${user.Username}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to delete account");
+      }
+
+      if (onUserDelete) {
+        onUserDelete();
+      }
+
+      localStorage.clear();
+      navigate("/login");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const favoriteMovies =
+    Array.isArray(movies) && Array.isArray(user.FavoriteMovies)
+      ? movies.filter((m) => user.FavoriteMovies.includes(m.id || m._id))
+      : [];
 
   return (
     <Container className="mt-4" style={{ maxWidth: "600px" }}>
-      <h2 className="mb-4">Edit {username}'s profile'</h2>
+      <h4 className="mb-4">Update {user.username}'s profile</h4>
 
       {error && <Alert variant="danger">{error}</Alert>}
       {success && (
@@ -86,33 +103,88 @@ const ProfileView = () => {
 
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="formName" className="mb-3">
-          <FloatingLabel>
+          <FloatingLabel label="Username">
             <Form.Control
               type="text"
-              name="name"
+              name="Username"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Enter your name"
+              placeholder="Enter new username"
+              required
+            />
+          </FloatingLabel>
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <FloatingLabel label="Password">
+            <Form.Control
+              type="password"
+              name="Password"
+              value={formData.Password}
+              onChange={handleChange}
+              placeholder="Enter new password"
+              required
             />
           </FloatingLabel>
         </Form.Group>
 
         <Form.Group controlId="formEmail" className="mb-3">
-          <FloatingLabel>
+          <FloatingLabel label="Email">
             <Form.Control
               type="email"
-              name="email"
-              value={formData.email}
+              name="Email"
+              value={formData.Email}
               onChange={handleChange}
-              placeholder="Enter your email"
+              placeholder="Enter new email address"
+              required
             />
           </FloatingLabel>
         </Form.Group>
 
-        <Button variant="primary" type="submit">
-          Save
-        </Button>
+        <Form.Group className="mb-3">
+          <FloatingLabel>
+            <Form.Control
+              type="date"
+              name="Birthday"
+              value={formData.Birthday}
+              onChange={handleChange}
+            />
+          </FloatingLabel>
+        </Form.Group>
+
+        <div className="d-flex justify-content-between">
+          <Button
+            variant="primary"
+            className="w-25"
+            type="submit"
+            style={{ color: "#f0fff0" }}
+          >
+            Update profile
+          </Button>
+          <Button
+            variant="danger"
+            className="w-25"
+            onClick={handleDelete}
+            style={{ color: "#f0fff0" }}
+          >
+            Delete account
+          </Button>
+        </div>
       </Form>
+
+      <hr className="my-4" />
+      <h4 className="mb-3">Favorite movies</h4>
+      {favoriteMovies.length === 0 ? (
+        <p>You don't have any favorite movies. Add some!</p>
+      ) : (
+        <Row>
+          {favoriteMovies.map((movie) => (
+            <Col md={6} lg={4} key={movie._id} className="mb-3">
+              <MovieCard movie={movie} />
+            </Col>
+          ))}
+        </Row>
+      )}
     </Container>
   );
 };
