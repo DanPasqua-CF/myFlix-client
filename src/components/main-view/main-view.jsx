@@ -34,16 +34,10 @@ const MainView = ({ user: initialUser, token, onLoggedOut }) => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
         return response.json();
       })
       .then((data) => {
         console.log("Movies from API:", data);
-
-        if (!Array.isArray(data)) {
-          console.error("Unexpected API format", data);
-          return;
-        }
 
         const moviesFromApi = data.map((doc) => ({
           id: doc._id,
@@ -63,13 +57,8 @@ const MainView = ({ user: initialUser, token, onLoggedOut }) => {
       });
   }, [token]);
 
-  const updateUser = (updatedUser) => {
-    setUser(updatedUser);
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-  };
-
   const handleUserUpdate = (updatedUser) => {
-    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
   };
 
   const handleUserDelete = () => {
@@ -79,28 +68,30 @@ const MainView = ({ user: initialUser, token, onLoggedOut }) => {
   };
 
   const onToggleFavorite = (movieId) => {
-    if (!user) {
+    if (!user || !token) {
       return;
     }
 
-    const isFavorite = user.favoriteMovies?.includes(movieId);
+    const isFavorite = user?.favoriteMovies?.includes(movieId);
     const method = isFavorite ? "DELETE" : "POST";
 
-    fetch(`${apiUrl}/users/${user.username}/favoriteMovies`, {
+    fetch(`${apiUrl}/users/${user.username}/favoriteMovies/${movieId}`, {
       method: method,
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
     })
       .then((response) => {
         if (!response.ok) {
           throw new Error("Update failed");
         }
-
         return response.json();
       })
-      .then((updatedUser) => {
-        updateUser(updatedUser);
+      .then((updatedUserResponse) => {
+        const updatedUser = updatedUserResponse.user || updatedUserResponse;
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
       })
       .catch((err) => {
         console.error("Failed to update favorites: ", err);
@@ -165,9 +156,7 @@ const MainView = ({ user: initialUser, token, onLoggedOut }) => {
                       <MovieCard
                         movie={movie}
                         isLoggedIn={isLoggedIn}
-                        isFavorite={
-                          user?.favorites?.includes(movie.id) || false
-                        }
+                        isFavorite={user?.favoriteMovies?.includes(movie.id)}
                         onToggleFavorite={onToggleFavorite}
                       />
                     </Col>

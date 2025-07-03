@@ -11,14 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import MovieCard from "../movie-card/movie-card";
 
-const ProfileView = ({
-  user,
-  token,
-  movies,
-  onUserUpdate,
-  onUserDelete,
-  onToggleFavorite,
-}) => {
+const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -186,26 +179,11 @@ const ProfileView = ({
       {favoriteMovies.length === 0 ? (
         <p>You don't have any favorite movies. Add some!</p>
       ) : (
-        <Row>
-          {favoriteMovies.map((movie) => {
-            const movieKey = movie.id || movie._id;
-
-            if (!movieKey) {
-              return null;
-            }
-
-            return (
-              <Col md={6} lg={4} key={movie._id} className="mb-3">
-                <MovieCard
-                  movie={movie}
-                  isLoggedIn={true}
-                  isFavorite={true}
-                  onToggleFavorite={onToggleFavorite}
-                />
-              </Col>
-            );
-          })}
-        </Row>
+        <ul>
+          {favoriteMovies.map((movie) => (
+            <li key={movie.id}>{movie.title}</li>
+          ))}
+        </ul>
       )}
     </Container>
   );

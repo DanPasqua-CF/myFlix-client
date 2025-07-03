@@ -10,7 +10,7 @@ const MovieView = ({ movies, user, onToggleFavorite }) => {
     return <div>Movie not found</div>;
   }
 
-  const isFavorite = user?.favorites?.includes(movie.id) || false;
+  const isFavorite = user?.favoriteMovies?.includes(movie.id) || false;
 
   const handleFavoriteClick = () => {
     if (onToggleFavorite) {
