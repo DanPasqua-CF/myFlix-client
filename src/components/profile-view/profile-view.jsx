@@ -11,7 +11,14 @@ import {
 import { useNavigate } from "react-router-dom";
 import MovieCard from "../movie-card/movie-card";
 
-const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
+const ProfileView = ({
+  user,
+  token,
+  movies,
+  onUserUpdate,
+  onUserDelete,
+  onToggleFavorite,
+}) => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -35,7 +42,7 @@ const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
     setSuccess(false);
 
     try {
-      const response = await fetch(`${apiUrl}/users/${username}`, {
+      const response = await fetch(`${apiUrl}/users/${user.Username}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -88,13 +95,15 @@ const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
   };
 
   const favoriteMovies =
-    Array.isArray(movies) && Array.isArray(user.FavoriteMovies)
-      ? movies.filter((m) => user.FavoriteMovies.includes(m.id || m._id))
+    Array.isArray(movies) && Array.isArray(user.favoriteMovies)
+      ? movies
+          .filter((m) => user.favoriteMovies.includes(m.id || m._id))
+          .sort((a, b) => a.title.localeCompare(b.title))
       : [];
 
   return (
     <Container className="mt-4" style={{ maxWidth: "600px" }}>
-      <h4 className="mb-4">Update {user.username}'s profile</h4>
+      <h4 className="mb-4">Update {user.Username}'s profile</h4>
 
       {error && <Alert variant="danger">{error}</Alert>}
       {success && (
@@ -107,7 +116,7 @@ const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
             <Form.Control
               type="text"
               name="Username"
-              value={formData.name}
+              value={formData.Username}
               onChange={handleChange}
               placeholder="Enter new username"
               required
@@ -178,11 +187,24 @@ const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
         <p>You don't have any favorite movies. Add some!</p>
       ) : (
         <Row>
-          {favoriteMovies.map((movie) => (
-            <Col md={6} lg={4} key={movie._id} className="mb-3">
-              <MovieCard movie={movie} />
-            </Col>
-          ))}
+          {favoriteMovies.map((movie) => {
+            const movieKey = movie.id || movie._id;
+
+            if (!movieKey) {
+              return null;
+            }
+
+            return (
+              <Col md={6} lg={4} key={movie._id} className="mb-3">
+                <MovieCard
+                  movie={movie}
+                  isLoggedIn={true}
+                  isFavorite={true}
+                  onToggleFavorite={onToggleFavorite}
+                />
+              </Col>
+            );
+          })}
         </Row>
       )}
     </Container>

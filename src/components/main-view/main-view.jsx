@@ -6,8 +6,9 @@ import MovieView from "../movie-view/movie-view";
 import NavigationBar from "../navigation-bar/navigation-bar";
 import ProfileView from "../profile-view/profile-view";
 import PropTypes from "prop-types";
-import "./main-view.scss";
 import UpdateUser from "../update-user/update-user";
+
+import "./main-view.scss";
 
 const MainView = ({ user: initialUser, token, onLoggedOut }) => {
   const [user, setUser] = useState(initialUser);
@@ -62,9 +63,13 @@ const MainView = ({ user: initialUser, token, onLoggedOut }) => {
       });
   }, [token]);
 
-  const handlUserUpdate = (updatedUser) => {
+  const updateUser = (updatedUser) => {
     setUser(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));
+  };
+
+  const handleUserUpdate = (updatedUser) => {
+    setUser(updatedUser);
   };
 
   const handleUserDelete = () => {
@@ -73,9 +78,40 @@ const MainView = ({ user: initialUser, token, onLoggedOut }) => {
     navigate("/login");
   };
 
+  const onToggleFavorite = (movieId) => {
+    if (!user) {
+      return;
+    }
+
+    const isFavorite = user.favoriteMovies?.includes(movieId);
+    const method = isFavorite ? "DELETE" : "POST";
+
+    fetch(`${apiUrl}/users/${user.username}/favoriteMovies`, {
+      method: method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Update failed");
+        }
+
+        return response.json();
+      })
+      .then((updatedUser) => {
+        updateUser(updatedUser);
+      })
+      .catch((err) => {
+        console.error("Failed to update favorites: ", err);
+      });
+  };
+
   const filteredMovies = movies.filter((movie) => {
     return movie.title.toLowerCase().includes(searchQuery.toLowerCase());
   });
+
+  const isLoggedIn = Boolean(user && token);
 
   return (
     <>
@@ -109,8 +145,9 @@ const MainView = ({ user: initialUser, token, onLoggedOut }) => {
                     user={user}
                     token={token}
                     movies={movies}
-                    onUserUpdate={handlUserUpdate}
+                    onUserUpdate={handleUserUpdate}
                     onUserDelete={handleUserDelete}
+                    onToggleFavorite={onToggleFavorite}
                   />
                 </Col>
               }
@@ -125,7 +162,14 @@ const MainView = ({ user: initialUser, token, onLoggedOut }) => {
                 ) : (
                   filteredMovies.map((movie) => (
                     <Col className="mb-4" key={movie.id} md={3}>
-                      <MovieCard movie={movie} />
+                      <MovieCard
+                        movie={movie}
+                        isLoggedIn={isLoggedIn}
+                        isFavorite={
+                          user?.favorites?.includes(movie.id) || false
+                        }
+                        onToggleFavorite={onToggleFavorite}
+                      />
                     </Col>
                   ))
                 )
