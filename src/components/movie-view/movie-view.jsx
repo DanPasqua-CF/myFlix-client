@@ -1,86 +1,68 @@
+import { Button } from "react-bootstrap";
 import { useParams, Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import MovieCard from "../movie-card/movie-card";
 import "./movie-view.scss";
 
 const MovieView = ({ movies, user, onToggleFavorite }) => {
   const { movieId } = useParams();
-  const movie = movies.find((m) => m.id === movieId);
+  const movie = movies.find((m) => m._id?.toString() === movieId);
 
   if (!movie) {
     return <div>Movie not found</div>;
   }
 
-  const isFavorite = user?.favoriteMovies?.includes(movie.id) || false;
+  const isFavorite = user?.favoriteMovies?.includes(movie._id);
 
   const handleFavoriteClick = () => {
     if (onToggleFavorite) {
-      onToggleFavorite(movie.id);
+      onToggleFavorite(movie._id);
     }
   };
 
   return (
-    <>
-      {movie.image?.imageUrl ? (
-        <img
-          src={movie.image.imageUrl}
-          alt={movie.title}
-          height={350}
-          width={250}
-        />
-      ) : (
-        <img src="/placeholder-image.jpg" alt="placeholder" />
-      )}
-      <div>
-        <strong>Title: </strong>
-        {movie.title}
-      </div>
+    <div className="movie-view-container">
+      <MovieCard
+        movie={movie}
+        isLoggedIn={!!user}
+        isFavorite={!!isFavorite}
+        onToggleFavorite={onToggleFavorite}
+        showDetailsButton={false}
+      />
 
-      <div>
-        <strong>Genre: </strong>
-        {Array.isArray(movie.genre)
-          ? movie.genre.map((g) => g.name).join(", ")
-          : movie.genre?.name}
-      </div>
-      <div>
-        <strong>Description: </strong>
-        {movie.description}
-      </div>
-      <div>
-        <strong>Director: </strong>
-        {movie.directors?.map((director) => director.name).join(", ")}
-      </div>
+      <div className="mt-4">
+        <h5>Description:</h5>
+        <p>{movie.description}</p>
 
-      {user && onToggleFavorite && (
-        <button
-          className={`favorite-button ${isFavorite ? "favorited" : ""}`}
-          onClick={handleFavoriteClick}
-          style={{
-            marginTop: "10px",
-            backgroundColor: isFavorite ? "#dc3545" : "#0d6efd",
-            color: "white",
-            border: "none",
-            padding: "8px 16px",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          {isFavorite ? "Unfavorite" : "Favorite"}
-        </button>
-      )}
+        <h5>Genre:</h5>
+        <p>
+          {Array.isArray(movie.genre)
+            ? movie.genre.map((g) => g.name).join(", ")
+            : movie.genre?.name}
+        </p>
 
-      <Link to={"/"}>
-        <button className="back-button" style={{ marginTop: "20px" }}>
-          Back
-        </button>
-      </Link>
-    </>
+        <h5>Directors</h5>
+        <p>
+          {movie.directors?.map((director) => director.name).join(", ") ||
+            "Director unknown"}
+        </p>
+
+        <div className="button-row">
+          <Link to={"/"}>
+            <Button variant="primary" className="back-button">
+              Back
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 };
 
 MovieView.propTypes = {
   movies: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.string.isRequired,
+      _id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
       genre: PropTypes.oneOfType([
         PropTypes.arrayOf(

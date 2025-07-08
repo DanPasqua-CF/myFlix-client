@@ -40,7 +40,7 @@ const MainView = ({ user: initialUser, token, onLoggedOut }) => {
         console.log("Movies from API:", data);
 
         const moviesFromApi = data.map((doc) => ({
-          id: doc._id,
+          _id: doc._id,
           title: doc.title,
           genre: doc.genre,
           description: doc.description,
@@ -59,6 +59,7 @@ const MainView = ({ user: initialUser, token, onLoggedOut }) => {
 
   const handleUserUpdate = (updatedUser) => {
     localStorage.setItem("user", JSON.stringify(updatedUser));
+    setUser(updatedUser);
   };
 
   const handleUserDelete = () => {
@@ -123,7 +124,11 @@ const MainView = ({ user: initialUser, token, onLoggedOut }) => {
                   <Col>The list is empty!</Col>
                 ) : (
                   <Col md={8}>
-                    <MovieView movies={movies} />
+                    <MovieView
+                      movies={movies}
+                      user={user}
+                      onToggleFavorite={onToggleFavorite}
+                    />
                   </Col>
                 )
               }
@@ -152,11 +157,11 @@ const MainView = ({ user: initialUser, token, onLoggedOut }) => {
                   <Col>No movies found.</Col>
                 ) : (
                   filteredMovies.map((movie) => (
-                    <Col className="mb-4" key={movie.id} md={3}>
+                    <Col className="mb-4" key={movie._id} md={3}>
                       <MovieCard
                         movie={movie}
                         isLoggedIn={isLoggedIn}
-                        isFavorite={user?.favoriteMovies?.includes(movie.id)}
+                        isFavorite={user?.favoriteMovies?.includes(movie._id)}
                         onToggleFavorite={onToggleFavorite}
                       />
                     </Col>

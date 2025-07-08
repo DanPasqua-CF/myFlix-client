@@ -10,15 +10,16 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import MovieCard from "../movie-card/movie-card";
+import UpdateUser from "../update-user/update-user";
 
 const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    Username: user.Username || "",
-    Password: "",
-    Email: user.Email || "",
-    Birthday: user.Birthday ? user.Birthday.slice(0, 10) : "",
+    username: user.username || "",
+    password: "",
+    email: user.email || "",
+    birthday: user.birthday ? user.birthday.slice(0, 10) : "",
   });
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -35,13 +36,20 @@ const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
     setSuccess(false);
 
     try {
-      const response = await fetch(`${apiUrl}/users/${user.Username}`, {
+      const payload = {
+        username: formData.username,
+        email: formData.email,
+        birthday: formData.birthday,
+        ...(formData.password && { password: formData.password }),
+      };
+
+      const response = await fetch(`${apiUrl}/users/${user.username}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -50,6 +58,7 @@ const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
 
       const updatedUser = await response.json();
       setSuccess(true);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
 
       if (onUserUpdate) {
         onUserUpdate(updatedUser);
@@ -65,7 +74,7 @@ const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
     }
 
     try {
-      const response = await fetch(`${apiUrl}/users/${user.Username}`, {
+      const response = await fetch(`${apiUrl}/users/${user.username}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -96,83 +105,20 @@ const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
 
   return (
     <Container className="mt-4" style={{ maxWidth: "600px" }}>
-      <h4 className="mb-4">Update {user.Username}'s profile</h4>
+      <h4 className="mb-4">Update profile</h4>
 
       {error && <Alert variant="danger">{error}</Alert>}
       {success && (
         <Alert variant="success">Profile updated successfully!</Alert>
       )}
 
-      <Form onSubmit={handleSubmit}>
-        <Form.Group controlId="formName" className="mb-3">
-          <FloatingLabel label="Username">
-            <Form.Control
-              type="text"
-              name="Username"
-              value={formData.Username}
-              onChange={handleChange}
-              placeholder="Enter new username"
-              required
-            />
-          </FloatingLabel>
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <FloatingLabel label="Password">
-            <Form.Control
-              type="password"
-              name="Password"
-              value={formData.Password}
-              onChange={handleChange}
-              placeholder="Enter new password"
-              required
-            />
-          </FloatingLabel>
-        </Form.Group>
-
-        <Form.Group controlId="formEmail" className="mb-3">
-          <FloatingLabel label="Email">
-            <Form.Control
-              type="email"
-              name="Email"
-              value={formData.Email}
-              onChange={handleChange}
-              placeholder="Enter new email address"
-              required
-            />
-          </FloatingLabel>
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <FloatingLabel>
-            <Form.Control
-              type="date"
-              name="Birthday"
-              value={formData.Birthday}
-              onChange={handleChange}
-            />
-          </FloatingLabel>
-        </Form.Group>
-
-        <div className="d-flex justify-content-between">
-          <Button
-            variant="primary"
-            className="w-25"
-            type="submit"
-            style={{ color: "#f0fff0" }}
-          >
-            Update profile
-          </Button>
-          <Button
-            variant="danger"
-            className="w-25"
-            onClick={handleDelete}
-            style={{ color: "#f0fff0" }}
-          >
-            Delete account
-          </Button>
-        </div>
-      </Form>
+      <UpdateUser
+        user={user}
+        formData={formData}
+        handleUpdate={handleChange}
+        handleSubmit={handleSubmit}
+        handleDelete={handleDelete}
+      />
 
       <hr className="my-4" />
       <h4 className="mb-3">Favorite movies</h4>
@@ -181,7 +127,7 @@ const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
       ) : (
         <ul>
           {favoriteMovies.map((movie) => (
-            <li key={movie.id}>{movie.title}</li>
+            <li key={movie._id}>{movie.title}</li>
           ))}
         </ul>
       )}

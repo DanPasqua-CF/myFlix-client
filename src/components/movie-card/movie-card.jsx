@@ -3,14 +3,16 @@ import { Button, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "./movie-card.scss";
 
-const buttonStyle = {
-  minWidth: "180px",
-};
-
-const MovieCard = ({ movie, isLoggedIn, isFavorite, onToggleFavorite }) => {
+const MovieCard = ({
+  movie,
+  isLoggedIn,
+  isFavorite,
+  onToggleFavorite,
+  showDetailsButton = true,
+}) => {
   const handleFavoriteClick = () => {
     if (onToggleFavorite) {
-      onToggleFavorite(movie.id);
+      onToggleFavorite(movie._id);
     }
   };
 
@@ -19,16 +21,21 @@ const MovieCard = ({ movie, isLoggedIn, isFavorite, onToggleFavorite }) => {
       <Card.Img variant="top" src={movie.image.imageUrl} />
       <Card.Body>
         <Card.Title>{movie.title}</Card.Title>
-        <Card.Text>{movie.directors.map((d) => d.name).join(", ")}</Card.Text>
-        <Link to={`/movies/${encodeURIComponent(movie.id)}`}>
-          <Button
-            variant="primary"
-            className="w-100"
-            style={{ color: "#f0fff0" }}
-          >
-            Open
-          </Button>
-        </Link>
+        <Card.Text>
+          {movie.directors?.map((d) => d.name).join(", ") || "Director unknown"}
+        </Card.Text>
+
+        {showDetailsButton && (
+          <Link to={`/movies/${encodeURIComponent(movie._id)}`}>
+            <Button
+              variant="primary"
+              className="w-100"
+              style={{ color: "#f0fff0" }}
+            >
+              Open
+            </Button>
+          </Link>
+        )}
 
         {isLoggedIn && (
           <Button
@@ -46,7 +53,7 @@ const MovieCard = ({ movie, isLoggedIn, isFavorite, onToggleFavorite }) => {
 
 MovieCard.propTypes = {
   movie: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    _id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     image: PropTypes.shape({
       imageUrl: PropTypes.string.isRequired,
@@ -60,6 +67,7 @@ MovieCard.propTypes = {
   isLoggedIn: PropTypes.bool.isRequired,
   isFavorite: PropTypes.bool.isRequired,
   onToggleFavorite: PropTypes.func.isRequired,
+  showDetailsButton: PropTypes.bool,
 };
 
 export default MovieCard;

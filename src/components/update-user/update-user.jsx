@@ -2,11 +2,15 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Form, Button, FloatingLabel } from "react-bootstrap";
 
-function UpdateUser({ user, handleSubmit, handleUpdate }) {
+function UpdateUser({
+  user,
+  formData,
+  handleSubmit,
+  handleUpdate,
+  handleDelete,
+}) {
   return (
     <Form className="profile-form" onSubmit={handleSubmit}>
-      <h2 className="mb-4">Update Profile</h2>
-
       <FloatingLabel
         controlId="floatingUsername"
         label="Username"
@@ -15,9 +19,8 @@ function UpdateUser({ user, handleSubmit, handleUpdate }) {
         <Form.Control
           type="text"
           name="username"
-          defaultValue={user.username}
+          value={formData.username}
           onChange={handleUpdate}
-          placeholder="Username"
           required
         />
       </FloatingLabel>
@@ -30,6 +33,7 @@ function UpdateUser({ user, handleSubmit, handleUpdate }) {
         <Form.Control
           type="password"
           name="password"
+          value={formData.password}
           onChange={handleUpdate}
           placeholder="Password"
           minLength="8"
@@ -45,16 +49,43 @@ function UpdateUser({ user, handleSubmit, handleUpdate }) {
         <Form.Control
           type="email"
           name="email"
-          defaultValue={user.email}
+          value={formData.email}
           onChange={handleUpdate}
           placeholder="name@example.com"
           required
         />
       </FloatingLabel>
 
-      <Button variant="primary" type="submit">
-        Submit
-      </Button>
+      <FloatingLabel
+        controlId="floatingBirthday"
+        label="Birthday"
+        className="mb-4"
+      >
+        <Form.Control
+          type="date"
+          name="birthday"
+          value={formData.birthday}
+          onChange={handleUpdate}
+        />
+      </FloatingLabel>
+
+      <div className="d-flex justify-content-between">
+        <Button
+          variant="primary"
+          type="submit"
+          style={{ width: "48%", color: "#f0fff0" }}
+        >
+          Submit
+        </Button>
+        <Button
+          variant="danger"
+          type="button"
+          onClick={handleDelete}
+          style={{ width: "48%", color: "#f0fff0" }}
+        >
+          Delete account
+        </Button>
+      </div>
     </Form>
   );
 }
