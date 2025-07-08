@@ -9,6 +9,7 @@ import {
   Row,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import FavoriteMovies from "../favorite-movies/favorite-movies";
 import MovieCard from "../movie-card/movie-card";
 import UpdateUser from "../update-user/update-user";
 
@@ -60,9 +61,7 @@ const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
       setSuccess(true);
       localStorage.setItem("user", JSON.stringify(updatedUser));
 
-      if (onUserUpdate) {
-        onUserUpdate(updatedUser);
-      }
+      onUserUpdate?.(updatedUser);
     } catch (err) {
       setError(err.message);
     }
@@ -85,9 +84,7 @@ const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
         throw new Error("Unable to delete account");
       }
 
-      if (onUserDelete) {
-        onUserDelete();
-      }
+      onUserDelete?.();
 
       localStorage.clear();
       navigate("/login");
@@ -96,11 +93,38 @@ const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
     }
   };
 
+  const handleRemoveFavorite = async (movieId) => {
+    try {
+      const response = await fetch(
+        `${apiUrl}/users/${user.username}/favoriteMovies/${movieId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error("Unable to remove favorite movie");
+
+      const updatedUser = await response.json();
+
+      if (onUserUpdate) {
+        onUserUpdate(updatedUser.user || updatedUser);
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   const favoriteMovies =
     Array.isArray(movies) && Array.isArray(user.favoriteMovies)
       ? movies
-          .filter((m) => user.favoriteMovies.includes(m.id || m._id))
-          .sort((a, b) => a.title.localeCompare(b.title))
+          .map((m) => ({ ...m, _id: m._id || m.id }))
+          .filter((m) => user.favoriteMovies.includes(m._id))
+          .sort((a, b) =>
+            (a.Title || a.title).localeCompare(b.Title || b.title)
+          )
       : [];
 
   return (
@@ -121,16 +145,10 @@ const ProfileView = ({ user, token, movies, onUserUpdate, onUserDelete }) => {
       />
 
       <hr className="my-4" />
-      <h4 className="mb-3">Favorite movies</h4>
-      {favoriteMovies.length === 0 ? (
-        <p>You don't have any favorite movies. Add some!</p>
-      ) : (
-        <ul>
-          {favoriteMovies.map((movie) => (
-            <li key={movie._id}>{movie.title}</li>
-          ))}
-        </ul>
-      )}
+      <FavoriteMovies
+        favoriteMoviesList={favoriteMovies}
+        removeFavorite={handleRemoveFavorite}
+      />
     </Container>
   );
 };
